@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+
+  test.api:
+      container_name: test-api-container
+      restart: always
+      build:
+        context: .
+        dockerfile: Dockerfile
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Production
+        - ASPNETCORE_URLS=http://+:80
+      ports:
+        - "5000:80"
+      networks:
+        - myappnetwork
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.22
+    container_name: jaegertracing
+    ports:
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 14268:14268
+      - 14250:14250
+      - 16686:16686
+      - 5778:5778
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    networks:
+    - myappnetwork
+
+networks:
+  myappnetwork:
+    name: myappnetwork
+    driver: bridge
